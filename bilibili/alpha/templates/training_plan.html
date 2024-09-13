@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>培养方案制定</title>
+    <style>
+        .category-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .category-list li {
+            cursor: pointer;
+            margin-bottom: 10px;
+            color: blue;
+        }
+        .category-list li:hover {
+            text-decoration: underline;
+        }
+        .course {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>选择课程类别</h1>
+    <ul class="category-list">
+        {% for category in categories %}
+            <li onclick="showCourses('{{ category.id }}')">{{ category.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <div id="courses">
+        <!-- 选中类别下的课程将在这里显示 -->
+    </div>
+
+    <script>
+        function showCourses(categoryId) {
+            fetch(`/get-courses-by-category?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let courses = data.courses;
+                    let coursesHtml = courses.map(course =>
+                        `<div class="course">
+                            <h3>${course.title}</h3>
+                            <p>${course.description}</p>
+                        </div>`
+                    ).join('');
+                    document.getElementById('courses').innerHTML = coursesHtml;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

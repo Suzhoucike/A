@@ -1,0 +1,140 @@
+{% load static %}
+{% load mptt_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>培养方案制定</title>
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 50px;
+        }
+
+        .category-container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .node-toggle {
+            cursor: pointer;
+            display: block;
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            color: black;
+            text-decoration: none;
+        }
+
+        .node-toggle:hover {
+            background-color: #e2e6ea;
+        }
+
+        .children {
+            margin-left: 20px;
+            display: none;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .topnav a {
+            float: left;
+            display: block;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .topnav a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <a href="#">链接一</a>
+    <a href="#">链接二</a>
+    <a href="#">链接三</a>
+</div>
+<div class="category-container">
+    <ul id="category-tree">
+        {% recursetree categories %}
+            <li class="category-node {% if node.is_leaf_node %}leaf-node{% endif %}">
+                <span class="node-toggle">{{ node.name }}</span>
+                {% if not node.is_leaf_node %}
+                    <ul class="children">
+                        {{ children }}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endrecursetree %}
+    </ul>
+</div>
+
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  Launch demo modal
+</button>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- 引入jQuery库 -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- 引入Bootstrap的JavaScript库 -->
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script><script>
+    document.addEventListener("DOMContentLoaded", function () {
+    var toggles = document.querySelectorAll('.node-toggle');
+    toggles.forEach(function (toggle) {
+        toggle.addEventListener('click', function (event) {
+            var parentNode = this.parentElement;
+            if (parentNode.classList.contains('leaf-node')) {
+                // 如果是叶子节点，则显示模态框
+                $('#myModal').modal('show');
+            } else {
+                // 如果不是叶子节点，则展开或折叠子节点
+                var children = this.nextElementSibling;
+                if (children && children.classList.contains('children')) {
+                    children.style.display = children.style.display === 'none' ? 'block' : 'none';
+                }
+            }
+        });
+    });
+});
+
+</script>
+</body>
+</html>

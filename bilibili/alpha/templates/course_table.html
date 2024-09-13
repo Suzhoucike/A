@@ -1,0 +1,395 @@
+{% load static %}
+{% load mptt_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>培养方案制定</title>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 50px;
+        }
+
+        .content-container {
+            display: flex;
+        }
+
+        .category-container, .right-container {
+            flex: 1;
+            padding: 20px;
+            margin: 10px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .node-toggle {
+            cursor: pointer;
+            display: block;
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #f1f1f1;
+            color: black;
+            text-decoration: none;
+        }
+
+        .node-toggle:hover {
+            background-color: #e2e6ea;
+        }
+
+        .children {
+            margin-left: 20px;
+            display: none;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .topnav a {
+            float: left;
+            display: block;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .topnav a:hover {
+            background-color: #0056b3;
+        }
+
+        .table-custom {
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        .table-custom th, .table-custom td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table-custom th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table-custom tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table-custom tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <a class="btn btn-danger" href="/stopmakingtrainingplan/">取消制定</a>
+    <a class="btn btn-success" href="/base/home/">制定完成</a>
+    <div style="float: right;">
+        <button id="add-selected-courses" class="btn btn-primary">添加选定课程</button>
+        <button id="finish-button" class="btn btn-success">整合培养方案</button>
+    </div>
+</div>
+
+<div class="content-container">
+    <form style="width: 600px">
+        <div class="category-container">
+            <ul id="category-tree">
+
+                {% recursetree categories %}
+                    <li class="category-node" id="category-{{ node.id }}">
+                        <span class="node-toggle{% if node.is_leaf_node %} leaf-node{% endif %}"
+                              data-category-id="{{ node.id }}">{{ node.name }}</span>
+                        {% if not node.is_leaf_node %}
+                            <ul class="children">
+                                {{ children }}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endrecursetree %}
+
+
+            </ul>
+        </div>
+    </form>
+    <div class="right-container">
+        <table class="table-custom">
+            <!-- 在表头中添加全选复选框 -->
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>课程名称</th>
+                <th>课程类别</th>
+                <th>开课学期</th>
+                <th>课程编码</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for obj in courses %}
+                <tr>
+
+                    <td>{{ obj.id }}</td>
+                    <td>{{ obj.name }}</td>
+                    <td>{{ obj.category }}</td>
+                    <td>{{ obj.semester }}</td>
+                    <td>{{ obj.coursecode }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="course-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">请选择该模块课程属性</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="courseType" id="requiredCourse" value="required">
+                        必修课
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="courseType" id="electiveCourse" value="elective">
+                        选修课
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="courseRemarks">备注:</label>
+                    <input type="text" class="form-control" id="courseRemarks" placeholder="请输入备注">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="confirm-button">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 引入jQuery库 -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- 引入Bootstrap的JavaScript库 -->
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
+<script>
+    var category_id;
+    var details;
+    var leaf_nodes = [];
+    // 处理点击 "添加选定课程" 按钮的事件
+    function showmodal() {
+        $('#course-modal').modal('show');
+    }
+
+    function confirm() {
+
+        var selectedValue = $('input[name="courseType"]:checked').val();
+        details = $('#courseRemarks').val();
+
+        if (selectedValue === "required") {
+            // 执行必修课的处理函数
+            handleRequiredCourseSelection();
+        } else if (selectedValue === "elective") {
+            // 执行选修课的处理函数
+            handleElectiveCourseSelection();
+        } else {
+            // 处理其他情况或显示错误消息
+            alert('请选择课程属性。');
+        }
+
+        // 关闭模态框
+        $('#course-modal').modal('hide');
+    }
+
+    // 处理选修课选项的函数
+    function handleElectiveCourseSelection() {
+        // 获取用户输入的选修最少学分
+        var minimumCredits = prompt("请输入选修最少学分：");
+
+        if (minimumCredits === null || minimumCredits === "") {
+            // 用户取消输入或未输入任何内容，显示错误消息
+            alert('请输入有效的选修最少学分。');
+            return;
+        }
+
+        // 转换输入为数字
+        minimumCredits = parseInt(minimumCredits);
+
+        if (isNaN(minimumCredits) || minimumCredits < 0) {
+            // 验证输入是否为有效的正整数
+            alert('请输入有效的正整数作为选修最少学分。');
+            return;
+        }
+
+        // 处理选中的课程
+        var selectedCourses = [];
+        $('.select-course:checked').each(function () {
+            selectedCourses.push($(this).val()); // 将选中课程的 ID 添加到数组中
+        });
+
+        if (selectedCourses.length > 0) {
+            // 发送 AJAX 请求将选中的课程和最少学分添加到后端
+            $.ajax({
+                url: '/add_elective_courses/',
+                method: 'POST',
+                data: {
+                    selected_courses: selectedCourses,
+                    minimum_credits: minimumCredits,
+                    category_id: category_id,
+                    details:details,
+                },
+                success: function (response) {
+                    // 处理成功响应
+                    console.log('课程添加成功:', response);
+                },
+                error: function (error) {
+                    console.error('课程添加失败:', error);
+                }
+            });
+        } else {
+            alert('请选择至少一门课程进行添加。');
+        }
+    }
+
+    function handleRequiredCourseSelection() {
+        //console.log("get in javascript")
+        var selectedCourses = [];
+        $('.select-course:checked').each(function () {
+            selectedCourses.push($(this).val()); // 将选中课程的 ID 添加到数组中
+        });
+        console.log(selectedCourses)
+        if (selectedCourses.length > 0) {
+            // 发送 AJAX 请求将选中的课程添加到 training_class 表格中
+            $.ajax({
+                url: '/add_selected_courses/',
+                method: 'POST',
+                data: {
+                    selected_courses: selectedCourses,
+                    category_id: category_id,
+                    details:details,
+                },
+                success: function (response) {
+                    // 处理成功响应
+                    console.log('课程添加成功:', response);
+                },
+                error: function (error) {
+                    console.error('课程添加失败:', error);
+                }
+            });
+        } else {
+            alert('请选择至少一门课程进行添加。');
+        }
+    }
+
+    // 处理左侧节点的点击事件和展开/折叠子节点的操作
+    function handleCategoryNodeClick() {
+        var toggles = document.querySelectorAll('.node-toggle');
+        toggles.forEach(function (toggle) {
+            toggle.addEventListener('click', function (event) {
+                if (this.classList.contains('leaf-node')) {
+
+                    category_id = this.dataset.categoryId;
+                    leaf_nodes.push(category_id);
+                    //console.log('categoryId:', categoryId);
+                    // 发送 AJAX 请求
+                    $.ajax({
+                        url: '/get/',
+                        method: 'GET',
+                        data: {category_id: category_id},
+                        success: function (data) {
+                            console.log('Received data:', data); // 调试用，检查返回的 JSON 数据
+                            // 解析 JSON 数据并生成表格
+                            var tableHtml = '<table class="table-custom">';
+                            tableHtml += '<thead><tr><th>ID</th><th>课程名称</th><th>课程类别</th><th>开课学期</th><th>课程编码</th><th>选择</th></tr></thead>';
+                            tableHtml += '<tbody>';
+                            $.each(data.courses, function (index, course) {
+                                tableHtml += '<tr>';
+                                tableHtml += '<td>' + course.id + '</td>';
+                                tableHtml += '<td>' + course.name + '</td>';
+                                tableHtml += '<td>' + course.category + '</td>';
+                                tableHtml += '<td>' + course.semester + '</td>';
+                                tableHtml += '<td>' + course.coursecode + '</td>';
+                                // 在每一行中添加一个复选框
+                                tableHtml += '<td><input type="checkbox" class="select-course" value="' + course.id + '"></td>';
+                                tableHtml += '</tr>';
+                            });
+                            tableHtml += '</tbody>';
+                            tableHtml += '</table>';
+
+                            // 更新右侧容器的内容
+                            $('.right-container').html(tableHtml);
+                        },
+                        error: function (error) {
+                            console.error(error);
+                        }
+                    });
+                } else {
+                    // 展开或折叠子节点
+                    var children = this.nextElementSibling;
+                    if (children && children.classList.contains('children')) {
+                        children.style.display = children.style.display === 'none' ? 'block' : 'none';
+                    }
+                }
+            });
+        });
+    }
+
+    function finish(){
+        $.ajax({
+                url: '/training_plan_generate/',
+                method: 'POST',
+                data: {
+                    category_id: category_id,
+                    leaf_nodes:leaf_nodes,
+                },
+                success: function (response) {
+                    // 处理成功响应
+                    console.log('结束培养方案制定，展示培养方案:', response);
+                },
+                error: function (error) {
+                    console.error('培养方案整合失败:', error);
+                }
+        });
+    }
+    // 在页面加载完成时添加事件监听器
+    document.addEventListener("DOMContentLoaded", function () {
+        // 处理 "添加选定课程" 按钮的点击事件
+        $('#add-selected-courses').on('click', showmodal);
+        $('#confirm-button').on('click', confirm);
+        $('#finish-button').on('click', finish);
+
+        // 处理左侧节点的点击事件和展开/折叠子节点的操作
+        handleCategoryNodeClick();
+    });
+
+</script>
+</body>
+</html>

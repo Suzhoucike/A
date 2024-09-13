@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>课程地图</title>
+    <link rel="stylesheet" href="{% static '/css/bootstrap.min.css'%}">
+    <style>
+
+        table {
+            border-collapse: separate;
+            border-spacing: 10px;
+            width: 100%;
+            empty-cells: hide; /* 设置空单元格为可见并设置为白色 */
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+        }
+
+        th {
+            background-color:#0056b3;
+            color: white;
+        }
+
+        td {
+            background-color: #80bdff;
+            color: white;
+        }
+        .c1{
+            background-color: #10707f;
+            color: #f0f0f0;
+        }
+        .c2{
+            background-color: #ed969e;
+            color: #f0f0f0;
+        }
+        .c3{
+            background-color: mediumseagreen;
+            color: white;
+        }
+        .c4{
+            background-color: #0056b3 ;
+            color: white;
+        }
+        .c5 {
+            background-color: lightsalmon;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .navbar-custom {
+            background-color: #007bff;
+            color: white;
+            border-radius: 0;
+            max-height: 50px;
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: white;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #ddd;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            margin-top: 70px;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            color: #495057;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-top: 1px solid #e5e5e5;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<div >
+<div style="padding-top: 70px;">
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top" >
+        <div class="container">
+            <a class="navbar-brand" href="#">课程数据库管理系统</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">{{ request.session.info.name }}<span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/base/home/">首页 <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout/">退出账户</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+<div style="border: 1px solid lightgray; padding: 10px; border-radius: 15px">
+<div style="width: 100%; text-align: center; background-color:#0056b3; border-radius: 10px; color:white;">
+    <h1>{{ name }}</h1>
+</div>
+<table>
+    <!-- 表头 -->
+    <tr>
+        <th>学期 / 课程类别</th>
+        <th colspan="{{ max_count1 }}">部类核心课</th>
+        <th colspan="{{ max_count2 }}">专业核心课</th>
+        <th>个性化选修</th>
+        <th class="c1">通识培养</th>
+        <th class="c2">创新研究与研究训练</th>
+        <th class="c3">素质拓展与发展指导</th>
+    </tr>
+
+    <!-- 第一学期 -->
+    <tr>
+        <td class="c4">第一学期</td>
+        {% for class in class_1_1 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        {% for class in class_2_1 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        <td></td>
+        <td rowspan="8" class="c1">通识模块</td>
+        <td rowspan="8" class="c2">研究训练</td>
+        <td rowspan="8" class="c3">公共选修课</td>
+    </tr>
+    <tr>
+        <td class="c4">第二学期</td>
+        {% for class in class_1_2 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        {% for class in class_2_2 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="c4">第三学期</td>
+        {% for class in class_1_3 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        {% for class in class_2_3 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="c4">第四学期</td>
+        {% for class in class_1_4 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        {% for class in class_2_4 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        <td rowspan="5">个性化任选课</td>
+    </tr>
+    <tr>
+        <td class="c4">第五学期</td>
+        {% for class in class_1_5 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        {% for class in class_2_5 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="c4">第六学期</td>
+        {% for class in class_1_6 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+        {% for class in class_2_6 %}
+            <td>{{ class.name }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="c4">第七学期</td>
+        <td colspan="5"></td>
+        <td class="c5">专业实习</td>
+        <td class="c5">毕业论文</td>
+    </tr>
+    <tr>
+        <td class="c4">第八学期</td>
+        <td colspan="6"></td>
+        <td class="c5">毕业论文</td>
+    </tr>
+</table>
+</div>
+</div>
+</body>
+</html>

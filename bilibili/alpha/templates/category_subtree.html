@@ -1,0 +1,10 @@
+
+{% load course_tags %}
+<tr>
+  <td rowspan="{{ node_info.children|length }}">{{ node_info.node.name }}</td>
+  <!-- 其他单元格数据... -->
+</tr>
+{% for child in node_info.children %}
+  {% render_node child as child_info %}
+  {% include "category_subtree.html" with node_info=child_info %}
+{% endfor %}

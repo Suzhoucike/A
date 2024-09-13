@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>删除课程</title>
+    <link rel="stylesheet" href="{% static '/css/bootstrap.min.css'%}">
+    <style>
+        body {
+            padding-top: 80px;
+            padding-bottom: 20px;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-custom {
+            background-color: #007bff;
+            color: white;
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: white;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #ddd;
+        }
+        .form-custom {
+            max-width: 400px;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        .footer {
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">课程数据库管理系统</a>
+            <a class="nav-link" href="/base/datamanage/course/">返回</a>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <h2 class="text-center my-4">删除课程</h2>
+        <form id="deleteForm" class="form-custom" method="post" action="/base/datamanage/course/delete/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="course_id">选择要删除的课程：</label>
+                <select class="form-control" id="course_id" name="course_id" required>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="button" class="btn btn-danger" onclick="showConfirmModal()">删除</button>
+        </form>
+
+        <!-- 模态框 -->
+        <div class="modal" id="confirmModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">确认删除</h5>
+                        <button type="button" class="close" data-dismiss="modal" onclick="hideconfirm()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>你确认要删除吗？</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="hideconfirm()" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger" onclick="submitForm()">确认删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if messages %}
+            <div class="alert alert-danger">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <footer class="footer mt-5">
+            <p>&copy; 2023 课程数据库管理系统</p>
+        </footer>
+    </div>
+
+    <!-- 引入jQuery库 -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- 引入Bootstrap的JavaScript库 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function showConfirmModal() {
+            console.log("hide");
+            $('#confirmModal').modal('show');
+        }
+
+        function submitForm() {
+            console.log("submit");
+            document.getElementById('deleteForm').submit();
+        }
+
+        function hideconfirm(){
+            $('#confirmModal').modal('hide');
+        }
+    </script>
+</body>
+</html>

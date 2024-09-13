@@ -1,0 +1,10 @@
+<!-- subcategories.html -->
+{% if categories %}
+    <ul>
+        {% for category in categories %}
+            <li>{{ category.name }} (Credits: {{ category.credits }})
+                {% include 'subcategories.html' with categories=category.get_children %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
